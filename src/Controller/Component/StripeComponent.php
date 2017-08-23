@@ -37,7 +37,7 @@ class StripeComponent extends Component
      * @param  Array  $plan [id, name, amount, interval]
      * @return Boolean
      */
-    public function createPlanifIfNotExist(Array $plan){
+    public function createPlanIfNotExist(Array $plan){
         //test si plan existe
         try {
             $plan = Plan::retrieve($plan['id']);
