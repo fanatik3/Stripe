@@ -27,7 +27,8 @@ class StripeComponent extends Component
     protected $_defaultConfig = [];
     protected $apiKey = '';
 
-    public function initialize(array $config){
+    public function initialize(array $config)
+    {
         $this->apiKey = Configure::read('Stripe.apiKey');
         Stripe::setApiKey($this->apiKey);
     }
@@ -37,10 +38,12 @@ class StripeComponent extends Component
      * @param  Array  $plan [id, name, amount, interval]
      * @return Boolean
      */
-    public function createPlanIfNotExist(Array $plan){
+    public function createPlanIfNotExist(Array $plan)
+    {
         //test si plan existe
         try {
             $plan = Plan::retrieve($plan['id']);
+
             return true;
         } catch (InvalidRequest $e) {
             //création du plan
@@ -55,14 +58,22 @@ class StripeComponent extends Component
             } catch (InvalidRequest $e) {
                 return false;
             }
+
             return true;
         }
     }
 
-    public function createCustomerIfNotExist($customer, $token){
-        if($customer->cus_id){
+    /**
+     * Create Customer in Stripe if not exist
+     * @param  customer, token
+     * @return Customer Id
+     */
+    public function createCustomerIfNotExist($customer, $token)
+    {
+        if($customer->cus_id) {
             try {
                 $cus = Customer::retrieve($customer->cus_id);
+
                 return $cus->id;
             } catch (\Stripe\Error\InvalidRequest $e) {
                 return false;
@@ -74,27 +85,33 @@ class StripeComponent extends Component
                     "source" => $token,
                     "email" => $customer->email)
                 );
-                return $cus->id;
 
+                return $cus->id;
             } catch (\Stripe\Error\InvalidRequest $e) {
                 return false;
             }
         }
     }
 
-    public function addSubscription($cus_id = null, $plan_id = null, $qte = 0, $coupon = null, $trial_end = null){
+    /**
+     * addSubscription
+     * @param  cusId, planId, qte = 0, coupon, trialEnd
+     * @return Subscription Id
+     */
+    public function addSubscription($cusId = null, $planId = null, $qte = 0, $coupon = null, $trialEnd = null)
+    {
         try {
             $options = array(
-              "customer" => $cus_id,
-              "plan" => $plan_id,
+              "customer" => $cusId,
+              "plan" => $planId,
               "quantity" => $qte,
             );
 
-            if($trial_end){
-                $options['trial_end'] = $trial_end;
+            if($trialEnd) {
+                $options['trial_end'] = $trialEnd;
             }
 
-            if($coupon){
+            if($coupon) {
                 $options['coupon'] = $coupon;
             }
 
@@ -106,9 +123,15 @@ class StripeComponent extends Component
         }
     }
 
-    public function removeSubscription($sub_id){
+    /**
+     * removeSubscription
+     * @param  subId
+     * @return Boolean
+     */
+    public function removeSubscription($subId)
+    {
         try {
-            $sub = Subscription::retrieve($sub_id);
+            $sub = Subscription::retrieve($subId);
             $sub->cancel();
 
             return true;
@@ -117,14 +140,20 @@ class StripeComponent extends Component
         }
     }
 
-    public function chargeByCustomerId($cus_id = null, $amount = null, $description = null, $statement_descriptor = null){
+    /**
+     * chargeByCustomerId
+     * @param  cusId, amount, description, statementDescriptor
+     * @return Charge Id
+     */
+    public function chargeByCustomerId($cusId = null, $amount = null, $description = null, $statementDescriptor = null)
+    {
         try {
             $charge = Charge::create(array(
-              "amount" => $amount,
-              "currency" => "eur",
-              "customer" => $cus_id, // obtained with Stripe.js
-              "description" => $description,
-              "statement_descriptor" => substr($statement_descriptor, 0, 22)
+                "amount" => $amount,
+                "currency" => "eur",
+                "customer" => $cusId, // obtained with Stripe.js
+                "description" => $description,
+                "statement_descriptor" => substr($statementDescriptor, 0, 22)
             ));
 
             return $charge->id;
@@ -132,37 +161,49 @@ class StripeComponent extends Component
 
             return false;
         }
-
     }
 
-    public function createCoupons($coupon){
+    /**
+     * createCoupons
+     * @param  coupon
+     * @return Coupon Id
+     */
+    public function createCoupons($coupon)
+    {
         try {
             $couponStripe = Coupon::create($coupon);
 
             return $couponStripe->id;
-
         } catch (\Stripe\Error\InvalidRequest $e) {
 
             return false;
         }
-
     }
 
-    public function updateCoupons($stripeId, $metadata){
+    /**
+     * updateCoupons
+     * @param  stripeId, metadata
+     * @return Coupon Id
+     */
+    public function updateCoupons($stripeId, $metadata)
+    {
         try {
-
             $couponStripe = Coupon::retrieve($stripeId);
             $couponStripe->metadata["redeem_by"] = $metadata["redeem_by"];
             $couponStripe->save();
-            return $couponStripe->id;
 
+            return $couponStripe->id;
         } catch (\Stripe\Error\InvalidRequest $e) {
 
             return false;
         }
-
     }
 
+    /**
+     * updateCard
+     * @param  customer, token
+     * @return Boolean
+     */
     public function updateCard($customer = null, $token = null)
     {
         if ($token) {
@@ -176,6 +217,56 @@ class StripeComponent extends Component
 
                 return false;
             }
+        }
+    }
+
+    /**
+     * createSourceByIban
+     * @param  customer, token
+     * @return Boolean
+     */
+    public function createSourceByIban($iban, $ibanOwner)
+    {
+        try {
+            $source = Source::create(
+                [
+                    "type" => "sepa_debit",
+                    "sepa_debit" => ["iban" => $iban],
+                    "currency" => "eur",
+                    "owner" => ["name" => $ibanOwner]
+                ]
+            );
+        
+            return $source->id;
+        } catch (\Stripe\Error\Base $e) {
+
+            return false;
+        }
+    }
+
+    /**
+     * chargeSepaByCustomerIdAndSourceId
+     * @param  customer, token
+     * @return Boolean
+     */
+    public function chargeSepaByCustomerIdAndSourceId($cusId = null, $srcId = null, $amount = null, $description = null, $statementDescriptor = null)
+    {
+        try {
+            $charge = Charge::create(
+                [
+                    "amount" => $amount,
+                    "currency" => "eur",
+                    "customer" => $cusId, // obtained with Stripe.js
+                    "source" => $srcId,
+                    "description" => $description,
+                    "statement_descriptor" => substr($statementDescriptor, 0, 22)
+                ]
+            );
+
+            return $charge->id;
+        } catch (\Stripe\Error\Base $e) {
+
+            return false;
         }
     }
 }
