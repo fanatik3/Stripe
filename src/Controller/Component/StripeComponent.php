@@ -12,6 +12,7 @@ use Stripe\Charge;
 use Stripe\Coupon;
 use Stripe\Error\InvalidRequest;
 use Stripe\Error\Card;
+use Stripe\Source;
 
 /**
  * Stripe component
