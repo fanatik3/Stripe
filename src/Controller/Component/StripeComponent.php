@@ -4,15 +4,15 @@ namespace Stripe\Controller\Component;
 use Cake\Controller\Component;
 use Cake\Controller\ComponentRegistry;
 use Cake\Core\Configure;
-use Stripe\Stripe;
-use Stripe\Plan;
-use Stripe\Customer;
-use Stripe\Subscription;
 use Stripe\Charge;
 use Stripe\Coupon;
-use Stripe\Error\InvalidRequest;
+use Stripe\Customer;
 use Stripe\Error\Card;
+use Stripe\Error\InvalidRequest;
+use Stripe\Plan;
 use Stripe\Source;
+use Stripe\Stripe;
+use Stripe\Subscription;
 
 /**
  * Stripe component
@@ -28,6 +28,11 @@ class StripeComponent extends Component
     protected $_defaultConfig = [];
     protected $apiKey = '';
 
+    /**
+     * initialize
+     * @param  Array  $config
+     * @return void
+     */
     public function initialize(array $config)
     {
         $this->apiKey = Configure::read('Stripe.apiKey');
@@ -37,7 +42,7 @@ class StripeComponent extends Component
     /**
      * Create Plan in Stripe if not exist
      * @param  Array  $plan [id, name, amount, interval]
-     * @return Boolean
+     * @return boolean
      */
     public function createPlanIfNotExist(Array $plan)
     {
@@ -49,12 +54,14 @@ class StripeComponent extends Component
         } catch (InvalidRequest $e) {
             //création du plan
             try {
-                $plan = Plan::create(array(
-                    "amount" => $plan['amount'] * 100,
-                    "interval" => $plan['interval'],
-                    "name" => $plan['name'],
-                    "currency" => "eur",
-                    "id" => $plan['id'])
+                $plan = Plan::create(
+                    [
+                        "amount" => $plan['amount'] * 100,
+                        "interval" => $plan['interval'],
+                        "name" => $plan['name'],
+                        "currency" => "eur",
+                        "id" => $plan['id']
+                    ]
                 );
             } catch (InvalidRequest $e) {
                 return false;
@@ -71,7 +78,7 @@ class StripeComponent extends Component
      */
     public function createCustomerIfNotExist($customer, $token)
     {
-        if($customer->cus_id) {
+        if ($customer->cus_id) {
             try {
                 $cus = Customer::retrieve($customer->cus_id);
 
@@ -79,12 +86,13 @@ class StripeComponent extends Component
             } catch (\Stripe\Error\InvalidRequest $e) {
                 return false;
             }
-        }
-        else {
+        } else {
             try {
-                $cus = Customer::create(array(
-                    "source" => $token,
-                    "email" => $customer->email)
+                $cus = Customer::create(
+                    [
+                        "source" => $token,
+                        "email" => $customer->email
+                    ]
                 );
 
                 return $cus->id;
@@ -102,23 +110,24 @@ class StripeComponent extends Component
     public function addSubscription($cusId = null, $planId = null, $qte = 0, $coupon = null, $trialEnd = null)
     {
         try {
-            $options = array(
-              "customer" => $cusId,
-              "plan" => $planId,
-              "quantity" => $qte,
-            );
+            $options = 
+                [
+                    "customer" => $cusId,
+                    "plan" => $planId,
+                    "quantity" => $qte
+                ];
 
-            if($trialEnd) {
+            if ($trialEnd) {
                 $options['trial_end'] = $trialEnd;
             }
 
-            if($coupon) {
+            if ($coupon) {
                 $options['coupon'] = $coupon;
             }
 
             $sub = Subscription::create($options);
-            return $sub->id;
 
+            return $sub->id;
         } catch (\Stripe\Error\Base $e) {
             return false;
         }
@@ -127,7 +136,7 @@ class StripeComponent extends Component
     /**
      * removeSubscription
      * @param  subId
-     * @return Boolean
+     * @return boolean
      */
     public function removeSubscription($subId)
     {
@@ -149,17 +158,18 @@ class StripeComponent extends Component
     public function chargeByCustomerId($cusId = null, $amount = null, $description = null, $statementDescriptor = null)
     {
         try {
-            $charge = Charge::create(array(
-                "amount" => $amount,
-                "currency" => "eur",
-                "customer" => $cusId, // obtained with Stripe.js
-                "description" => $description,
-                "statement_descriptor" => substr($statementDescriptor, 0, 22)
-            ));
+            $charge = Charge::create(
+                [
+                    "amount" => $amount,
+                    "currency" => "eur",
+                    "customer" => $cusId, // obtained with Stripe.js
+                    "description" => $description,
+                    "statement_descriptor" => substr($statementDescriptor, 0, 22)
+                ]
+            );
 
             return $charge->id;
         } catch (\Stripe\Error\Base $e) {
-
             return false;
         }
     }
@@ -176,7 +186,6 @@ class StripeComponent extends Component
 
             return $couponStripe->id;
         } catch (\Stripe\Error\InvalidRequest $e) {
-
             return false;
         }
     }
@@ -195,7 +204,6 @@ class StripeComponent extends Component
 
             return $couponStripe->id;
         } catch (\Stripe\Error\InvalidRequest $e) {
-
             return false;
         }
     }
@@ -203,19 +211,18 @@ class StripeComponent extends Component
     /**
      * updateCard
      * @param  customer, token
-     * @return Boolean
+     * @return boolean
      */
     public function updateCard($customer = null, $token = null)
     {
         if ($token) {
             try {
-                $cu = Customer::retrieve($customer->cus_id);
-                $cu->source = $token;
-                $cu->save;
+                $customer = Customer::retrieve($customer->cus_id);
+                $customer->source = $token;
+                $customer->save();
 
                 return true;
             } catch (\Stripe\Error\Card $e) {
-
                 return false;
             }
         }
@@ -224,7 +231,7 @@ class StripeComponent extends Component
     /**
      * createSourceByIban
      * @param  customer, token
-     * @return Boolean
+     * @return boolean
      */
     public function createSourceByIban($iban, $ibanOwner)
     {
@@ -240,7 +247,6 @@ class StripeComponent extends Component
         
             return $source->id;
         } catch (\Stripe\Error\Base $e) {
-
             return false;
         }
     }
@@ -248,7 +254,7 @@ class StripeComponent extends Component
     /**
      * chargeSepaByCustomerIdAndSourceId
      * @param  customer, token
-     * @return Boolean
+     * @return boolean
      */
     public function chargeSepaByCustomerIdAndSourceId($cusId = null, $srcId = null, $amount = null, $description = null, $statementDescriptor = null)
     {
@@ -266,8 +272,27 @@ class StripeComponent extends Component
 
             return $charge->id;
         } catch (\Stripe\Error\Base $e) {
-
             return false;
         }
     }
+
+    /**
+     * updateSource
+     * @param  customer, iban, ibanOwner
+     * @return boolean
+     */
+     public function updateSource($customer = null, $iban = null, $ibanOwner = null)
+     {
+         if ($token) {
+             try {
+                 $customer = Customer::retrieve($customer->cus_id);
+                 $customer->source = $this->createSourceByIban($iban, $ibanOwner);
+                 $customer->save();
+ 
+                 return true;
+             } catch (\Stripe\Error\Card $e) {
+                 return false;
+             }
+         }
+     }
 }
