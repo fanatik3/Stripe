@@ -289,7 +289,7 @@ class StripeComponent extends Component
                  $customer->source = $this->createSourceByIban($iban, $ibanOwner);
                  $customer->save();
  
-                 return true;
+                 return $customer->source;
              } catch (\Stripe\Error\Card $e) {
                  return false;
              }
