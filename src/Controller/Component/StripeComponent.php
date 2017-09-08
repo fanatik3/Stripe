@@ -283,16 +283,14 @@ class StripeComponent extends Component
      */
      public function updateSource($customer = null, $iban = null, $ibanOwner = null)
      {
-         if ($token) {
-             try {
-                 $customer = Customer::retrieve($customer->cus_id);
-                 $customer->source = $this->createSourceByIban($iban, $ibanOwner);
-                 $customer->save();
- 
-                 return $customer->source;
-             } catch (\Stripe\Error\Card $e) {
-                 return false;
-             }
-         }
+        try {
+            $customer = Customer::retrieve($customer->cus_id);
+            $customer->source = $this->createSourceByIban($iban, $ibanOwner);
+            $customer->save();
+
+            return $customer->source;
+        } catch (\Stripe\Error\Card $e) {
+            return false;
+        }
      }
 }
