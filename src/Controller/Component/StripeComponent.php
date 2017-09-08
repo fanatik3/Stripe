@@ -245,7 +245,7 @@ class StripeComponent extends Component
                 ]
             );
         
-            return $source;
+            return $source->id;
         } catch (\Stripe\Error\Base $e) {
             return false;
         }
