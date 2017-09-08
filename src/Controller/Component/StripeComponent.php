@@ -245,7 +245,7 @@ class StripeComponent extends Component
                 ]
             );
         
-            return $source->id;
+            return $source;
         } catch (\Stripe\Error\Base $e) {
             return false;
         }
@@ -281,16 +281,17 @@ class StripeComponent extends Component
      * @param  customer, iban, ibanOwner
      * @return boolean
      */
-     public function updateSource($customer = null, $iban = null, $ibanOwner = null)
-     {
+    public function updateSource($customer = null, $iban = null, $ibanOwner = null)
+    {
         try {
             $customer = Customer::retrieve($customer->cus_id);
-            $customer->source = $this->createSourceByIban($iban, $ibanOwner);
+            $srcId = $this->createSourceByIban($iban, $ibanOwner);
+            $customer->source = $srcId;
             $customer->save();
 
-            return $customer->source;
+            return $srcId;
         } catch (\Stripe\Error\Card $e) {
             return false;
         }
-     }
+    }
 }
