@@ -30,7 +30,7 @@ class StripeComponent extends Component
 
     /**
      * initialize
-     * @param  Array  $config
+     * @param  array  $config  [description]
      * @return void
      */
     public function initialize(array $config)
@@ -41,8 +41,8 @@ class StripeComponent extends Component
 
     /**
      * Create Plan in Stripe if not exist
-     * @param  Array  $plan [id, name, amount, interval]
-     * @return boolean
+     * @param  array  $plan [id, name, amount, interval]  [description]
+     * @return bool
      */
     public function createPlanIfNotExist(Array $plan)
     {
@@ -141,7 +141,7 @@ class StripeComponent extends Component
     /**
      * removeSubscription
      * @param  [type]   $subId [description]
-     * @return boolean
+     * @return bool
      */
     public function removeSubscription($subId)
     {
@@ -221,7 +221,7 @@ class StripeComponent extends Component
      * updateCard
      * @param [type]  $customer [description]
      * @param [type]  $token    [description]
-     * @return boolean
+     * @return bool
      */
     public function updateCard($customer = null, $token = null)
     {
@@ -240,9 +240,9 @@ class StripeComponent extends Component
 
     /**
      * createSourceByIban
-     * @param [type]  $iban                    [description]
-     * @param [type]  $ibanOwner                    [description]
-     * @return boolean
+     * @param [type] $iban [description]
+     * @param [type] $ibanOwner [description]
+     * @return bool
      */
     public function createSourceByIban($iban, $ibanOwner)
     {
@@ -255,7 +255,7 @@ class StripeComponent extends Component
                     "owner" => ["name" => $ibanOwner]
                 ]
             );
-        
+
             return $source->id;
         } catch (\Stripe\Error\Base $e) {
             return false;
@@ -269,7 +269,7 @@ class StripeComponent extends Component
      * @param [type]  $amount                   [description]
      * @param [type]  $description              [description]
      * @param [type]  $statementDescriptor      [description]
-     * @return boolean
+     * @return bool
      */
     public function chargeSepaByCustomerIdAndSourceId($cusId = null, $srcId = null, $amount = null, $description = null, $statementDescriptor = null)
     {
@@ -296,7 +296,7 @@ class StripeComponent extends Component
      * @param [type]  $customer    [description]
      * @param [type]  $iban    [description]
      * @param [type]  $ibanOwner    [description]
-     * @return boolean
+     * @return bool
      */
     public function updateSource($customer = null, $iban = null, $ibanOwner = null)
     {
