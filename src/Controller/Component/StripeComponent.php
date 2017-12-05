@@ -73,7 +73,8 @@ class StripeComponent extends Component
 
     /**
      * Create Customer in Stripe if not exist
-     * @param  customer, token
+     * @param  [type]   $customer [description]
+     * @param  [type]   $token [description]
      * @return Customer Id
      */
     public function createCustomerIfNotExist($customer, $token)
@@ -104,7 +105,11 @@ class StripeComponent extends Component
 
     /**
      * addSubscription
-     * @param  cusId, planId, qte = 0, coupon, trialEnd
+     * @param  [type]   $cusId [description]
+     * @param  [type]   $planId [description]
+     * @param  [type]   $qte [description]
+     * @param  [type]   $coupon [description]
+     * @param  [type]   $trialEnd [description]
      * @return Subscription Id
      */
     public function addSubscription($cusId = null, $planId = null, $qte = 0, $coupon = null, $trialEnd = null)
@@ -135,7 +140,7 @@ class StripeComponent extends Component
 
     /**
      * removeSubscription
-     * @param  subId
+     * @param  [type]   $subId [description]
      * @return boolean
      */
     public function removeSubscription($subId)
@@ -152,7 +157,10 @@ class StripeComponent extends Component
 
     /**
      * chargeByCustomerId
-     * @param  cusId, amount, description, statementDescriptor
+     * @param  [type]   $cusId [description]
+     * @param  [type]   $amount [description]
+     * @param  [type]   $description [description]
+     * @param  [type]   $statementDescriptor [description]
      * @return Charge Id
      */
     public function chargeByCustomerId($cusId = null, $amount = null, $description = null, $statementDescriptor = null)
@@ -176,7 +184,7 @@ class StripeComponent extends Component
 
     /**
      * createCoupons
-     * @param  coupon
+     * @param  [type]   $coupon [description]
      * @return Coupon Id
      */
     public function createCoupons($coupon)
@@ -192,7 +200,8 @@ class StripeComponent extends Component
 
     /**
      * updateCoupons
-     * @param  stripeId, metadata
+     * @param [type]  $stripeId     [description]
+     * @param [type]  $metadata     [description]
      * @return Coupon Id
      */
     public function updateCoupons($stripeId, $metadata)
@@ -210,7 +219,8 @@ class StripeComponent extends Component
 
     /**
      * updateCard
-     * @param  customer, token
+     * @param [type]  $customer [description]
+     * @param [type]  $token    [description]
      * @return boolean
      */
     public function updateCard($customer = null, $token = null)
@@ -230,7 +240,8 @@ class StripeComponent extends Component
 
     /**
      * createSourceByIban
-     * @param  customer, token
+     * @param [type]  $iban                    [description]
+     * @param [type]  $ibanOwner                    [description]
      * @return boolean
      */
     public function createSourceByIban($iban, $ibanOwner)
@@ -253,7 +264,11 @@ class StripeComponent extends Component
 
     /**
      * chargeSepaByCustomerIdAndSourceId
-     * @param  customer, token
+     * @param [type]  $cusId                    [description]
+     * @param [type]  $srcId                    [description]
+     * @param [type]  $amount                   [description]
+     * @param [type]  $description              [description]
+     * @param [type]  $statementDescriptor      [description]
      * @return boolean
      */
     public function chargeSepaByCustomerIdAndSourceId($cusId = null, $srcId = null, $amount = null, $description = null, $statementDescriptor = null)
@@ -278,7 +293,9 @@ class StripeComponent extends Component
 
     /**
      * updateSource
-     * @param  customer, iban, ibanOwner
+     * @param [type]  $customer    [description]
+     * @param [type]  $iban    [description]
+     * @param [type]  $ibanOwner    [description]
      * @return boolean
      */
     public function updateSource($customer = null, $iban = null, $ibanOwner = null)
@@ -291,6 +308,30 @@ class StripeComponent extends Component
 
             return $srcId;
         } catch (\Stripe\Error\Card $e) {
+            return false;
+        }
+    }
+
+    /**
+     * [addOrUpdateSubscription description]
+     * @param [type]  $cusId    [description]
+     * @param [type]  $planId   [description]
+     * @param int $qte      [description]
+     * @param [type]  $coupon   [description]
+     * @param [type]  $trialEnd [description]
+     * @param [type]  $subId    [description]
+     * @return bool           [description]
+     */
+    public function addOrUpdateSubscription($cusId = null, $planId = null, $qte = 0, $coupon = null, $trialEnd = null, $subId = null)
+    {
+        try {
+            if ($subId) {
+                $this->removeSubscription($subId);
+            }
+
+            $this->addSubscription($cusId, $planId, $qte, $coupon, $trialEnd);
+
+        } catch (\Stripe\Error\Base $e) {
             return false;
         }
     }
