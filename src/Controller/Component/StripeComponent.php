@@ -326,7 +326,11 @@ class StripeComponent extends Component
     {
         try {
             if ($subId) {
-                $this->removeSubscription($subId);
+                $subscription = Subscription::retrieve($subId);
+                $subscription->plan = $planId;
+                $subscription->save();
+
+                return $subId;
             }
 
             return $this->addSubscription($cusId, $planId, $qte, $coupon, $trialEnd);
