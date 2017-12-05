@@ -329,8 +329,7 @@ class StripeComponent extends Component
                 $this->removeSubscription($subId);
             }
 
-            $this->addSubscription($cusId, $planId, $qte, $coupon, $trialEnd);
-
+            return $this->addSubscription($cusId, $planId, $qte, $coupon, $trialEnd);
         } catch (\Stripe\Error\Base $e) {
             return false;
         }
