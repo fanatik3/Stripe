@@ -337,9 +337,9 @@ class StripeComponent extends Component
 
     /**
      * updatePlan
-     * @param [type]  $stripeId     [description]
-     * @param [type]  $metadata     [description]
-     * @return Coupon Id
+     * @param [type]  $subId     [description]
+     * @param [type]  $newPlan     [description]
+     * @return int Id
      */
     public function updatePlan($subId, $newPlan)
     {
