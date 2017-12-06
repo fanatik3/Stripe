@@ -345,7 +345,7 @@ class StripeComponent extends Component
     {
         try {
             $subscription = Subscription::retrieve($subId);
-            $subscription->plan = $planId;
+            $subscription->plan = $newPlan;
             $subscription->save();
 
             return $subscription->id;
