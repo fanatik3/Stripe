@@ -326,11 +326,30 @@ class StripeComponent extends Component
     {
         try {
             if ($subId) {
-                $this->removeSubscription($subId);
+                return $this->updatePlan($subId, $planId);
             }
 
             return $this->addSubscription($cusId, $planId, $qte, $coupon, $trialEnd);
         } catch (\Stripe\Error\Base $e) {
+            return false;
+        }
+    }
+
+    /**
+     * updatePlan
+     * @param [type]  $subId     [description]
+     * @param [type]  $newPlan     [description]
+     * @return int Id
+     */
+    public function updatePlan($subId, $newPlan)
+    {
+        try {
+            $subscription = Subscription::retrieve($subId);
+            $subscription->plan = $planId;
+            $subscription->save();
+
+            return $subscription->id;
+        } catch (\Stripe\Error\InvalidRequest $e) {
             return false;
         }
     }
