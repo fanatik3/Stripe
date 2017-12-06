@@ -314,13 +314,13 @@ class StripeComponent extends Component
 
     /**
      * [addOrUpdateSubscription description]
-     * @param [type]  $cusId    [description]
-     * @param [type]  $planId   [description]
-     * @param int $qte      [description]
-     * @param [type]  $coupon   [description]
-     * @param [type]  $trialEnd [description]
-     * @param [type]  $subId    [description]
-     * @return bool           [description]
+     * @param [type]  $cusId    Customer Identifier
+     * @param [type]  $planId   Plan Identifier
+     * @param int $qte      Quantite
+     * @param [type]  $coupon   Coupon identifier
+     * @param [type]  $trialEnd Date end trial
+     * @param [type]  $subId    Subscription identifier
+     * @return bool
      */
     public function addOrUpdateSubscription($cusId = null, $planId = null, $qte = 0, $coupon = null, $trialEnd = null, $subId = null)
     {
@@ -337,15 +337,15 @@ class StripeComponent extends Component
 
     /**
      * updatePlan
-     * @param [type]  $subId     [description]
-     * @param [type]  $newPlan     [description]
+     * @param [type]  $subId     Subscription identifier
+     * @param [type]  $newPlan     New Plan Identifier
      * @return int Id
      */
     public function updatePlan($subId, $newPlan)
     {
         try {
             $subscription = Subscription::retrieve($subId);
-            $subscription->plan = $planId;
+            $subscription->plan = $newPlan;
             $subscription->save();
 
             return $subscription->id;
