@@ -1,5 +1,5 @@
 {
-    "name": "Iteracode/Stripe",
+    "name": "iteracode/stripe",
     "description": "Stripe plugin for CakePHP",
     "type": "cakephp-plugin",
     "require": {
