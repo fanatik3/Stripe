@@ -58,8 +58,9 @@ class StripeComponent extends Component
                     [
                         "amount" => $plan['amount'] * 100,
                         "interval" => $plan['interval'],
-                        "name" => $plan['name'],
+                        "nickname" => $plan['name'],
                         "currency" => "eur",
+                        "product" => $plan['product'],
                         "id" => $plan['id']
                     ]
                 );
