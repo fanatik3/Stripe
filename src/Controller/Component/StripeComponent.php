@@ -10,6 +10,7 @@ use Stripe\Customer;
 use Stripe\Error\Card;
 use Stripe\Error\InvalidRequest;
 use Stripe\Plan;
+use Stripe\Product;
 use Stripe\Source;
 use Stripe\Stripe;
 use Stripe\Subscription;
@@ -38,6 +39,37 @@ class StripeComponent extends Component
         $this->apiKey = Configure::read('Stripe.apiKey');
         Stripe::setApiKey($this->apiKey);
     }
+
+    /**
+     * Create Product in Stripe if not exist
+     * @param  array  $prod [id, name]  [description]
+     * @return bool
+     */
+    public function createProductIfNotExist(Array $prod)
+    {
+        //test si plan existe
+        try {
+            $prod = Product::retrieve($prod['id']);
+
+            return true;
+        } catch (InvalidRequest $e) {
+            //création du plan
+            try {
+                $prod = Product::create(
+                    [
+                        "id" => $prod['id'],
+                        "name" => $prod['name'],
+                        "type" => 'service'
+                    ]
+                );
+            } catch (InvalidRequest $e) {
+                return false;
+            }
+
+            return true;
+        }
+    }
+
 
     /**
      * Create Plan in Stripe if not exist
@@ -70,6 +102,23 @@ class StripeComponent extends Component
 
             return true;
         }
+    }
+
+    /**
+     * Delete Plan in Stripe
+     * @param  array  $plan [id, name, amount, interval]
+     * @return bool
+     */
+    public function deletePlan($id)
+    {
+      
+            $plan = Plan::retrieve($id);
+
+
+            if($plan != null)
+                $plan->delete();
+
+            return true;
     }
 
     /**
