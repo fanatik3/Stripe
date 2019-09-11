@@ -11,6 +11,7 @@ use Stripe\Error\Card;
 use Stripe\Error\InvalidRequest;
 use Stripe\Plan;
 use Stripe\Product;
+use Stripe\Checkout\Session;
 use Stripe\Source;
 use Stripe\Stripe;
 use Stripe\Subscription;
@@ -68,6 +69,45 @@ class StripeComponent extends Component
 
             return true;
         }
+    }
+
+    /**
+     * Create Checkout session in Stripe
+     * @param $customer_email
+     * @param $plan
+     * @param $success
+     * @param $error
+     * @return mixed
+     */
+    public function createCheckoutSession($customer_id,$customer_email, $plan, $success, $error)
+    {
+        if($customer_id != null)
+        $session = Session::create([
+            'customer' => $customer_id,
+            'payment_method_types' => ['card'],
+            'subscription_data' => [
+                'items' => [[
+                    'plan' => $plan
+                ]],
+            ],
+            'success_url' => $success,
+            'cancel_url' => $error,
+        ]);
+        else
+            $session = Session::create([
+                'customer_email' => $customer_email,
+                'payment_method_types' => ['card'],
+                'subscription_data' => [
+                    'items' => [[
+                        'plan' => $plan
+                    ]],
+                ],
+                'success_url' => $success,
+                'cancel_url' => $error,
+            ]);
+
+
+        return $session;
     }
 
 
