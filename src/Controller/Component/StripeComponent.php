@@ -10,6 +10,8 @@ use Stripe\Customer;
 use Stripe\Error\Card;
 use Stripe\Error\InvalidRequest;
 use Stripe\Plan;
+use Stripe\BalanceTransaction;
+use Stripe\Payout;
 use Stripe\Product;
 use Stripe\Checkout\Session;
 use Stripe\Source;
@@ -110,7 +112,27 @@ class StripeComponent extends Component
         return $session;
     }
 
+    public function getAllBalance($start)
+    {
 
+        $start = str_replace('/', '-', $start);
+            
+        Stripe::setVerifySslCerts(false);
+        $balance = BalanceTransaction::all(['type' => 'charge','created >' => strtotime($start),'limit'=> 40]);
+        return $balance;
+
+    }
+    public function getAllPayout($start,$end)
+    {
+
+        $start = str_replace('/', '-', $start);
+        $end = str_replace('/', '-', $end);
+
+        Stripe::setVerifySslCerts(false);
+        $balance = BalanceTransaction::all(['limit'=> 400, 'created' => ['gte' =>strtotime($start), 'lte'=>strtotime($end)],'type' => 'charge']);
+        return $balance;
+
+    }
     /**
      * Create Plan in Stripe if not exist
      * @param  array  $plan [id, name, amount, interval]  [description]
