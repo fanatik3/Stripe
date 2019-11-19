@@ -302,6 +302,7 @@ class StripeComponent extends Component
      */
     public function createCoupons($coupon)
     {
+          \Stripe\Stripe::setVerifySslCerts(false);
         try {
             $couponStripe = Coupon::create($coupon);
 
@@ -319,6 +320,7 @@ class StripeComponent extends Component
      */
     public function updateCoupons($stripeId, $metadata)
     {
+          \Stripe\Stripe::setVerifySslCerts(false);
         try {
             $couponStripe = Coupon::retrieve($stripeId);
             $couponStripe->metadata["redeem_by"] = $metadata["redeem_by"];
