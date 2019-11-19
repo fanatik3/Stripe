@@ -83,6 +83,7 @@ class StripeComponent extends Component
      */
     public function createCheckoutSession($customer_id,$customer_email, $plan, $success, $error)
     {
+            \Stripe\Stripe::setVerifySslCerts(false);
         if($customer_id != null)
         $session = Session::create([
             'customer' => $customer_id,
