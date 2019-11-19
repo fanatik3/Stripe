@@ -302,7 +302,7 @@ class StripeComponent extends Component
      */
     public function createCoupons($coupon)
     {
-          \Stripe\Stripe::setVerifySslCerts(false);
+          
         try {
             $couponStripe = Coupon::create($coupon);
 
