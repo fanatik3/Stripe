@@ -190,7 +190,7 @@ class StripeComponent extends Component
      * @param  [type]   $token [description]
      * @return Customer Id
      */
-    public function createCustomerIfNotExist($customer, $token)
+    public function createCustomerIfNotExist($customer, $coupon)
     {
         if ($customer->cus_id) {
             try {
@@ -204,7 +204,7 @@ class StripeComponent extends Component
             try {
                 $cus = Customer::create(
                     [
-                        "source" => $token,
+                        "coupon" => $coupon,
                         "email" => $customer->email
                     ]
                 );
