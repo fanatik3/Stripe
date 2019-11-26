@@ -8,7 +8,7 @@ use Stripe\Charge;
 use Stripe\Coupon;
 use Stripe\Customer;
 use Stripe\Error\Card;
-use Stripe\Error\InvalidRequest;
+use Stripe\Exception\InvalidRequestException;
 use Stripe\Plan;
 use Stripe\BalanceTransaction;
 use Stripe\Payout;
@@ -56,7 +56,7 @@ class StripeComponent extends Component
             $prod = Product::retrieve($prod['id']);
 
             return true;
-        } catch (InvalidRequest $e) {
+        } catch (InvalidRequestException $e) {
             //création du plan
             try {
                 $prod = Product::create(
@@ -66,7 +66,7 @@ class StripeComponent extends Component
                         "type" => 'service'
                     ]
                 );
-            } catch (InvalidRequest $e) {
+            } catch (InvalidRequestException $e) {
                 return false;
             }
 
@@ -148,7 +148,7 @@ class StripeComponent extends Component
             $plan = Plan::retrieve($plan['id']);
 
             return true;
-        } catch (InvalidRequest $e) {
+        } catch (InvalidRequestException $e) {
             //création du plan
             try {
                 $plan = Plan::create(
@@ -161,7 +161,7 @@ class StripeComponent extends Component
                         "id" => $plan['id']
                     ]
                 );
-            } catch (InvalidRequest $e) {
+            } catch (InvalidRequestException $e) {
                 return false;
             }
 
@@ -199,7 +199,7 @@ class StripeComponent extends Component
                 $cus = Customer::retrieve($customer->cus_id);
 
                 return $cus->id;
-            } catch (\Stripe\Error\InvalidRequest $e) {
+            } catch (InvalidRequestException $e) {
                 return false;
             }
         } else {
@@ -212,7 +212,7 @@ class StripeComponent extends Component
                 );
 
                 return $cus->id;
-            } catch (\Stripe\Error\InvalidRequest $e) {
+            } catch (InvalidRequestException $e) {
                 return false;
             }
         }
@@ -265,7 +265,7 @@ class StripeComponent extends Component
             $sub->cancel();
 
             return true;
-        } catch (\Stripe\Error\InvalidRequest $e) {
+        } catch (InvalidRequestException $e) {
             return false;
         }
     }
@@ -309,7 +309,7 @@ class StripeComponent extends Component
             $couponStripe = Coupon::create($coupon);
 
             return $couponStripe->id;
-        } catch (\Stripe\Error\InvalidRequest $e) {
+        } catch (InvalidRequestException $e) {
             return false;
         }
     }
@@ -329,7 +329,7 @@ class StripeComponent extends Component
             $couponStripe->save();
 
             return $couponStripe->id;
-        } catch (\Stripe\Error\InvalidRequest $e) {
+        } catch (InvalidRequestException $e) {
             return false;
         }
     }
