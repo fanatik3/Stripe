@@ -141,6 +141,7 @@ class StripeComponent extends Component
      */
     public function createPlanIfNotExist(Array $plan)
     {
+         Stripe::setVerifySslCerts(false);
         //test si plan existe
         try {
             $plan = Plan::retrieve($plan['id']);
@@ -174,7 +175,7 @@ class StripeComponent extends Component
      */
     public function deletePlan($id)
     {
-      
+       Stripe::setVerifySslCerts(false);
             $plan = Plan::retrieve($id);
 
 
