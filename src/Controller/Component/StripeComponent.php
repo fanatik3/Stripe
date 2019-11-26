@@ -50,6 +50,7 @@ class StripeComponent extends Component
      */
     public function createProductIfNotExist(Array $prod)
     {
+         Stripe::setVerifySslCerts(false);
         //test si plan existe
         try {
             $prod = Product::retrieve($prod['id']);
