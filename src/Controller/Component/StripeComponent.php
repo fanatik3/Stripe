@@ -443,7 +443,11 @@ class StripeComponent extends Component
     {
         try {
             if ($subId) {
+                 try {
                 return $this->updatePlan($subId, $planId);
+                      } catch (InvalidRequestException $e) {
+            return $subId;
+        }
             }
 
             return $this->addSubscription($cusId, $planId, $qte, $coupon, $trialEnd);
@@ -466,7 +470,7 @@ class StripeComponent extends Component
             $subscription->save();
 
             return $subscription->id;
-        } catch (\Stripe\Error\InvalidRequest $e) {
+        } catch (InvalidRequestException $e) {
             return false;
         }
     }
