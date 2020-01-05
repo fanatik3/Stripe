@@ -6,6 +6,7 @@ use Cake\Controller\ComponentRegistry;
 use Cake\Core\Configure;
 use Stripe\Charge;
 use Stripe\Coupon;
+use Stripe\Invoice;
 use Stripe\Customer;
 use Stripe\Error\Card;
 use Stripe\Exception\InvalidRequestException;
@@ -71,6 +72,27 @@ class StripeComponent extends Component
             }
 
             return true;
+        }
+    }
+     private function createInvoice($params)
+    {
+
+        try {
+            return Invoice::create($params);
+        } catch (InvalidRequestException $e) {
+
+            return false;
+        }
+    }
+    
+     private function removeCouponInStripe($couponName)
+    {
+
+        try {
+            return Coupon::retrieve($couponName)->delete();
+        } catch (InvalidRequestException $e) {
+
+            return false;
         }
     }
 
